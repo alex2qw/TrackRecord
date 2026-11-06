@@ -53,7 +53,9 @@ class TrackRecordDatabase:
 
     def __init__(self, path: str | Path = "trackrecord.sqlite3") -> None:
         self.path = Path(path)
-        self._connection = sqlite3.connect(self.path)
+        # Flask may serve requests on a different worker thread from the one
+        # that created the application and its SQLite connection.
+        self._connection = sqlite3.connect(self.path, check_same_thread=False)
         self._connection.row_factory = sqlite3.Row
         self._connection.execute("PRAGMA foreign_keys = ON")
         self._connection.executescript(SCHEMA)
