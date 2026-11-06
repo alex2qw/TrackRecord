@@ -42,6 +42,33 @@ pytest
 flask --app trackrecord.app run --debug
 ```
 
+### Phase 2: HSP normalization
+
+The HSP client reads `NRE_USERNAME` and `NRE_PASSWORD` from `.env`. To fetch
+the saved sample RID and create a local detail fixture:
+
+```bash
+python fetch_service_details.py
+```
+
+The client uses `HSP_SERVICE_DETAILS_URL` when set. Otherwise it derives the
+service-details URL from `HSP_METRICS_URL`. Credentials are never written to
+fixtures or logs.
+
+To import the saved detail fixture into SQLite:
+
+```bash
+python import_service.py --database trackrecord.sqlite3
+```
+
+The importer is idempotent: importing the same service twice does not create
+duplicate stop events. The database file is ignored by Git.
+
+The persistence model keeps `services`, `stations`, `service_stops`, and
+`collection_runs` separate. Arrival and departure observations are stored as
+different stop events so reliability metrics can distinguish an on-time
+departure from an on-time arrival.
+
 ## Roadmap
 
 1. Select and document a permitted data source.

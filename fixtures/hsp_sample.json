@@ -1,0 +1,284 @@
+{
+  "header": {
+    "from_location": "HML",
+    "to_location": "EUS"
+  },
+  "Services": [
+    {
+      "serviceAttributesMetrics": {
+        "origin_location": "MKC",
+        "destination_location": "EUS",
+        "gbtt_ptd": "0703",
+        "gbtt_pta": "0737",
+        "toc_code": "LM",
+        "matched_services": "2",
+        "rids": [
+          "202610126717911",
+          "202610136717911"
+        ]
+      },
+      "Metrics": [
+        {
+          "tolerance_value": "0",
+          "num_not_tolerance": "2",
+          "num_tolerance": "0",
+          "percent_tolerance": "0",
+          "global_tolerance": true
+        }
+      ]
+    },
+    {
+      "serviceAttributesMetrics": {
+        "origin_location": "TRI",
+        "destination_location": "EUS",
+        "gbtt_ptd": "0720",
+        "gbtt_pta": "0752",
+        "toc_code": "LM",
+        "matched_services": "2",
+        "rids": [
+          "202610128788157",
+          "202610138788157"
+        ]
+      },
+      "Metrics": [
+        {
+          "tolerance_value": "0",
+          "num_not_tolerance": "1",
+          "num_tolerance": "1",
+          "percent_tolerance": "50",
+          "global_tolerance": true
+        }
+      ]
+    },
+    {
+      "serviceAttributesMetrics": {
+        "origin_location": "BLY",
+        "destination_location": "EUS",
+        "gbtt_ptd": "0724",
+        "gbtt_pta": "0757",
+        "toc_code": "LM",
+        "matched_services": "2",
+        "rids": [
+          "202610128981032",
+          "202610138981032"
+        ]
+      },
+      "Metrics": [
+        {
+          "tolerance_value": "0",
+          "num_not_tolerance": "1",
+          "num_tolerance": "1",
+          "percent_tolerance": "50",
+          "global_tolerance": true
+        }
+      ]
+    },
+    {
+      "serviceAttributesMetrics": {
+        "origin_location": "BLY",
+        "destination_location": "EUS",
+        "gbtt_ptd": "0736",
+        "gbtt_pta": "0811",
+        "toc_code": "LM",
+        "matched_services": "2",
+        "rids": [
+          "202610128981034",
+          "202610138981034"
+        ]
+      },
+      "Metrics": [
+        {
+          "tolerance_value": "0",
+          "num_not_tolerance": "1",
+          "num_tolerance": "1",
+          "percent_tolerance": "50",
+          "global_tolerance": true
+        }
+      ]
+    },
+    {
+      "serviceAttributesMetrics": {
+        "origin_location": "TRI",
+        "destination_location": "EUS",
+        "gbtt_ptd": "0750",
+        "gbtt_pta": "0822",
+        "toc_code": "LM",
+        "matched_services": "2",
+        "rids": [
+          "202610128788161",
+          "202610138788161"
+        ]
+      },
+      "Metrics": [
+        {
+          "tolerance_value": "0",
+          "num_not_tolerance": "2",
+          "num_tolerance": "0",
+          "percent_tolerance": "0",
+          "global_tolerance": true
+        }
+      ]
+    },
+    {
+      "serviceAttributesMetrics": {
+        "origin_location": "TRI",
+        "destination_location": "EUS",
+        "gbtt_ptd": "0759",
+        "gbtt_pta": "0828",
+        "toc_code": "LM",
+        "matched_services": "2",
+        "rids": [
+          "202610128788162",
+          "202610138788162"
+        ]
+      },
+      "Metrics": [
+        {
+          "tolerance_value": "0",
+          "num_not_tolerance": "2",
+          "num_tolerance": "0",
+          "percent_tolerance": "0",
+          "global_tolerance": true
+        }
+      ]
+    },
+    {
+      "serviceAttributesMetrics": {
+        "origin_location": "MKC",
+        "destination_location": "EUS",
+        "gbtt_ptd": "0803",
+        "gbtt_pta": "0839",
+        "toc_code": "LM",
+        "matched_services": "2",
+        "rids": [
+          "202610128770256",
+          "202610138770256"
+        ]
+      },
+      "Metrics": [
+        {
+          "tolerance_value": "0",
+          "num_not_tolerance": "2",
+          "num_tolerance": "0",
+          "percent_tolerance": "0",
+          "global_tolerance": true
+        }
+      ]
+    },
+    {
+      "serviceAttributesMetrics": {
+        "origin_location": "TRI",
+        "destination_location": "EUS",
+        "gbtt_ptd": "0820",
+        "gbtt_pta": "0852",
+        "toc_code": "LM",
+        "matched_services": "2",
+        "rids": [
+          "202610128788166",
+          "202610138788166"
+        ]
+      },
+      "Metrics": [
+        {
+          "tolerance_value": "0",
+          "num_not_tolerance": "1",
+          "num_tolerance": "1",
+          "percent_tolerance": "50",
+          "global_tolerance": true
+        }
+      ]
+    },
+    {
+      "serviceAttributesMetrics": {
+        "origin_location": "TRI",
+        "destination_location": "EUS",
+        "gbtt_ptd": "0830",
+        "gbtt_pta": "0900",
+        "toc_code": "LM",
+        "matched_services": "2",
+        "rids": [
+          "202610128788170",
+          "202610138788170"
+        ]
+      },
+      "Metrics": [
+        {
+          "tolerance_value": "0",
+          "num_not_tolerance": "1",
+          "num_tolerance": "1",
+          "percent_tolerance": "50",
+          "global_tolerance": true
+        }
+      ]
+    },
+    {
+      "serviceAttributesMetrics": {
+        "origin_location": "MKC",
+        "destination_location": "EUS",
+        "gbtt_ptd": "0834",
+        "gbtt_pta": "0909",
+        "toc_code": "LM",
+        "matched_services": "2",
+        "rids": [
+          "202610128770263",
+          "202610138770263"
+        ]
+      },
+      "Metrics": [
+        {
+          "tolerance_value": "0",
+          "num_not_tolerance": "2",
+          "num_tolerance": "0",
+          "percent_tolerance": "0",
+          "global_tolerance": true
+        }
+      ]
+    },
+    {
+      "serviceAttributesMetrics": {
+        "origin_location": "TRI",
+        "destination_location": "EUS",
+        "gbtt_ptd": "0850",
+        "gbtt_pta": "0922",
+        "toc_code": "LM",
+        "matched_services": "2",
+        "rids": [
+          "202610128788174",
+          "202610138788174"
+        ]
+      },
+      "Metrics": [
+        {
+          "tolerance_value": "0",
+          "num_not_tolerance": "1",
+          "num_tolerance": "1",
+          "percent_tolerance": "50",
+          "global_tolerance": true
+        }
+      ]
+    },
+    {
+      "serviceAttributesMetrics": {
+        "origin_location": "TRI",
+        "destination_location": "EUS",
+        "gbtt_ptd": "0900",
+        "gbtt_pta": "0931",
+        "toc_code": "LM",
+        "matched_services": "2",
+        "rids": [
+          "202610128788178",
+          "202610138788178"
+        ]
+      },
+      "Metrics": [
+        {
+          "tolerance_value": "0",
+          "num_not_tolerance": "1",
+          "num_tolerance": "1",
+          "percent_tolerance": "50",
+          "global_tolerance": true
+        }
+      ]
+    }
+  ]
+}
