@@ -21,6 +21,7 @@ class HspClient:
         *,
         base_url: str = "https://hspfeeds.nationalrail.co.uk",
         service_details_url: str | None = None,
+        metrics_url: str | None = None,
         timeout_seconds: float = 30.0,
     ) -> None:
         if not username or not password:
@@ -28,6 +29,7 @@ class HspClient:
         if timeout_seconds <= 0:
             raise ValueError("timeout_seconds must be positive")
 
+        self._metrics_url = metrics_url
         self._service_details_url = service_details_url or (
             f"{base_url.rstrip('/')}/serviceDetails"
         )
@@ -42,24 +44,37 @@ class HspClient:
             }
         )
 
+    def get_service_metrics(self, query: dict[str, Any]) -> dict[str, Any]:
+        """Fetch a serviceMetrics summary for a bounded date/time query."""
+        if not self._metrics_url:
+            raise ValueError("metrics_url is required for serviceMetrics")
+        if not query:
+            raise ValueError("serviceMetrics query must not be empty")
+        return self._post_json(self._metrics_url, query, "serviceMetrics")
+
     def get_service_details(self, rid: str) -> dict[str, Any]:
         """Fetch stop-level details for one HSP RID."""
         if not rid.strip():
             raise ValueError("rid must not be empty")
 
+        return self._post_json(
+            self._service_details_url, {"rid": rid}, "serviceDetails"
+        )
+
+    def _post_json(
+        self, url: str, payload: dict[str, Any], endpoint: str
+    ) -> dict[str, Any]:
         try:
             response = self._session.post(
-                self._service_details_url,
-                json={"rid": rid},
-                timeout=self._timeout_seconds,
+                url, json=payload, timeout=self._timeout_seconds
             )
             response.raise_for_status()
-            payload = response.json()
+            result = response.json()
         except requests.RequestException as exc:
-            raise HspClientError("serviceDetails request failed") from exc
+            raise HspClientError(f"{endpoint} request failed") from exc
         except ValueError as exc:
-            raise HspClientError("serviceDetails returned invalid JSON") from exc
+            raise HspClientError(f"{endpoint} returned invalid JSON") from exc
 
-        if not isinstance(payload, dict):
-            raise HspClientError("serviceDetails returned an unexpected payload")
-        return payload
+        if not isinstance(result, dict):
+            raise HspClientError(f"{endpoint} returned an unexpected payload")
+        return result

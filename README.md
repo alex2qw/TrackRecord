@@ -69,6 +69,33 @@ The persistence model keeps `services`, `stations`, `service_stops`, and
 different stop events so reliability metrics can distinguish an on-time
 departure from an on-time arrival.
 
+### Collecting a bounded historical sample
+
+The collector first obtains a `serviceMetrics` summary, extracts unique RIDs,
+then fetches service details one at a time with a configurable limit and
+pause. This avoids an unbounded request burst while building the local sample.
+
+With credentials in `.env`, collect up to 10 services for a date range:
+
+```bash
+python collect_hsp.py \
+  --from-date 2026-10-12 \
+  --to-date 2026-10-13 \
+  --max-services 10
+```
+
+To develop without requesting a new summary, reuse the saved summary fixture:
+
+```bash
+python collect_hsp.py \
+  --summary-fixture fixtures/hsp_sample.json \
+  --max-services 2
+```
+
+Both commands still request service details, so credentials and a working
+`HSP_SERVICE_DETAILS_URL` (or the documented default) are required. The
+collector records each imported service and safely ignores duplicate events.
+
 ### Phase 4: historical metrics
 
 Metric definitions and the pure metrics engine are documented in
