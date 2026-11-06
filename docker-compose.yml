@@ -4,7 +4,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - trackrecord-data:/app/data
+      - ./trackrecord.sqlite3:/app/data/trackrecord.sqlite3
     environment:
       TRACKRECORD_DATABASE: /app/data/trackrecord.sqlite3
     healthcheck:
@@ -12,6 +12,3 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-
-volumes:
-  trackrecord-data:

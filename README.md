@@ -160,9 +160,9 @@ The app can be run as a small container demo with a persistent SQLite volume:
 docker compose up --build
 ```
 
-Open `http://127.0.0.1:8000/`. The container starts with an empty database;
-collect or import data separately, then mount or copy the database into the
-volume. This demo does not include credentials or live collection jobs.
+Open `http://127.0.0.1:8000/`. The container uses the local `trackrecord.sqlite3` file, so imported local
+data appears in the demo. This demo does not include credentials or live
+collection jobs.
 
 ### Phase 6: dashboard
 
