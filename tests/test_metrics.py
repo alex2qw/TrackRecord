@@ -74,6 +74,10 @@ def test_grouping_uses_service_date_and_scheduled_hour() -> None:
 
     assert set(calculator.group_by_weekday(events)) == {"Monday", "Tuesday"}
     assert set(calculator.group_by_hour(events)) == {7, 8}
+    assert list(calculator.group_by_date(events)) == [
+        "2026-10-12",
+        "2026-10-13",
+    ]
 
 
 def test_empty_metrics_are_explicitly_unavailable() -> None:

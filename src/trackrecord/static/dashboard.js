@@ -18,7 +18,7 @@ function formatMinutes(value) {
   return value == null ? "—" : `${Number(value).toFixed(1)} min`;
 }
 
-function drawBars(container, entries, valueKey = "value") {
+function drawBars(container, entries, valueKey = "value", formatter = formatPercent) {
   container.replaceChildren();
   if (!entries.length) {
     container.textContent = "No grouped observations available.";
@@ -37,7 +37,7 @@ function drawBars(container, entries, valueKey = "value") {
     track.append(fill);
     const value = document.createElement("span");
     value.className = "bar-value";
-    value.textContent = formatPercent(entry[valueKey]);
+    value.textContent = formatter(entry[valueKey]);
     row.append(label, track, value);
     container.append(row);
   }
@@ -71,10 +71,11 @@ async function loadDashboard() {
   errorBox.hidden = true;
   try {
     const query = queryString();
-    const [reliability, delays, byHour] = await Promise.all([
+    const [reliability, delays, byHour, byDate] = await Promise.all([
       fetch(`/api/v1/reliability?${query}`).then(readResponse),
       fetch(`/api/v1/delays?${query}`).then(readResponse),
       fetch(`/api/v1/reliability/by-hour?${query}`).then(readResponse),
+      fetch(`/api/v1/reliability/by-date?${query}`).then(readResponse),
     ]);
     const metrics = reliability.metrics;
     if (!metrics.total_events) {
@@ -102,6 +103,14 @@ async function loadDashboard() {
       label: `${String(group.hour).padStart(2, "0")}:00`,
       value: group.metrics.on_time_percentage,
     })));
+    drawBars(document.querySelector("#date-reliability"), byDate.groups.map(group => ({
+      label: group.date,
+      value: group.metrics.on_time_percentage,
+    })));
+    drawBars(document.querySelector("#date-delay"), byDate.groups.map(group => ({
+      label: group.date,
+      value: group.metrics.average_delay_minutes,
+    })), "value", formatMinutes);
     content.hidden = false;
   } catch (error) {
     errorBox.textContent = error.message || "Unable to load dashboard data.";

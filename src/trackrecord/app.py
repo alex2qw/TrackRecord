@@ -188,4 +188,17 @@ def create_app(database_path: str | Path = "trackrecord.sqlite3") -> Flask:
             ]
         }
 
+    @app.get("/api/v1/reliability/by-date")
+    def reliability_by_date():
+        result = events_for_request()
+        if isinstance(result[0], dict):
+            return result
+        _, events = result
+        return {
+            "groups": [
+                {"date": service_date, "metrics": metrics_to_dict(metrics)}
+                for service_date, metrics in calculator.group_by_date(events).items()
+            ]
+        }
+
     return app

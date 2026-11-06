@@ -97,6 +97,20 @@ class MetricsCalculator:
             for hour in sorted(groups)
         }
 
+    def group_by_date(
+        self, events: Iterable[TrainEvent]
+    ) -> dict[str, ReliabilityMetrics]:
+        """Calculate metrics grouped by the service's operational date."""
+        groups: defaultdict[str, list[TrainEvent]] = defaultdict(list)
+        for event in events:
+            service_date = _service_date(event.service_id)
+            if service_date is not None:
+                groups[service_date.isoformat()].append(event)
+        return {
+            service_date: self.reliability(groups[service_date])
+            for service_date in sorted(groups)
+        }
+
 
 def delay_bands(
     events: Iterable[TrainEvent],

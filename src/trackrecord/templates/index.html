@@ -72,20 +72,28 @@
           </div>
 
           <div class="grid">
+            <section class="panel chart-panel trend-panel">
+              <div class="section-heading compact"><div><p class="eyebrow">03 · TREND</p><h2>Reliability by service date</h2></div></div>
+              <div class="trend-grid">
+                <div><h3>On-time percentage</h3><div id="date-reliability" class="bars"></div></div>
+                <div><h3>Average delay</h3><div id="date-delay" class="bars"></div></div>
+              </div>
+              <p class="caption">Each point represents the services in the selected operational date.</p>
+            </section>
             <section class="panel chart-panel">
-              <div class="section-heading compact"><div><p class="eyebrow">03 · DELAYS</p><h2>Delay distribution</h2></div></div>
+              <div class="section-heading compact"><div><p class="eyebrow">04 · DELAYS</p><h2>Delay distribution</h2></div></div>
               <div id="delay-bars" class="bars"></div>
               <p class="caption">Cancelled services are excluded from delay bands. “On time” includes early services.</p>
             </section>
             <section class="panel chart-panel">
-              <div class="section-heading compact"><div><p class="eyebrow">04 · BY HOUR</p><h2>Scheduled departure pattern</h2></div></div>
+              <div class="section-heading compact"><div><p class="eyebrow">05 · BY HOUR</p><h2>Scheduled departure pattern</h2></div></div>
               <div id="hour-groups" class="bars"></div>
               <p class="caption">Bars show on-time percentage for each scheduled local hour.</p>
             </section>
           </div>
 
           <section class="panel table-panel">
-            <div class="section-heading compact"><div><p class="eyebrow">05 · CONTEXT</p><h2>Data context</h2></div></div>
+            <div class="section-heading compact"><div><p class="eyebrow">06 · CONTEXT</p><h2>Data context</h2></div></div>
             <dl class="context-grid">
               <div><dt>Source</dt><dd id="data-source">—</dd></div>
               <div><dt>Last observed</dt><dd id="last-observed">—</dd></div>

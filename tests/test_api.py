@@ -86,6 +86,17 @@ def test_grouping_endpoints_return_json(tmp_path) -> None:
     assert any(group["hour"] == 7 for group in hour.get_json()["groups"])
 
 
+def test_date_trend_endpoint_returns_sorted_groups(tmp_path) -> None:
+    client, _ = client_with_fixture(tmp_path)
+
+    response = client.get("/api/v1/reliability/by-date")
+
+    assert response.status_code == 200
+    groups = response.get_json()["groups"]
+    assert groups[0]["date"] == "2026-10-12"
+    assert groups[0]["metrics"]["total_events"] > 0
+
+
 def test_latest_collection_endpoint_reports_import(tmp_path) -> None:
     client, _ = client_with_fixture(tmp_path)
 
