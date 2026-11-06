@@ -31,4 +31,4 @@ select = ["E", "F", "I"]
 where = ["src"]
 
 [tool.setuptools.package-data]
-trackrecord = ["templates/*.html", "static/*"]
+trackrecord = ["templates/*.html", "static/*", "static/react/*", "static/react/assets/*"]

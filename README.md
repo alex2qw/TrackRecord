@@ -172,6 +172,19 @@ sample-size information, and data-coverage context. This phase uses only the
 historical API; live Darwin forecasts and TfL transfer calculations are not
 included.
 
+The dashboard source is now a React/Vite application in `frontend/`. Flask
+continues to own the API and serves the built React files. To develop the
+frontend:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+The production bundle is built into
+`src/trackrecord/static/react/` and is included in the Docker image.
+
 ## Roadmap
 
 1. Select and document a permitted data source.

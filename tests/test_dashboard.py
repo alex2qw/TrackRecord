@@ -7,7 +7,7 @@ def test_dashboard_page_is_served(tmp_path) -> None:
 
     assert response.status_code == 200
     assert b"TrackRecord" in response.data
-    assert b"Choose a journey view" in response.data
+    assert b'id="root"' in response.data or b"Choose a journey view" in response.data
 
 
 def test_dashboard_assets_are_served(tmp_path) -> None:
@@ -19,3 +19,11 @@ def test_dashboard_assets_are_served(tmp_path) -> None:
 
     assert css.status_code == 200
     assert javascript.status_code == 200
+
+
+def test_react_dashboard_assets_are_served(tmp_path) -> None:
+    app = create_app(tmp_path / "dashboard.sqlite3")
+    response = app.test_client().get("/")
+
+    assert response.status_code == 200
+    assert b'id="root"' in response.data

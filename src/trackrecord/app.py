@@ -4,7 +4,7 @@ import os
 from datetime import date
 from pathlib import Path
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_from_directory
 from werkzeug.exceptions import HTTPException
 
 from .database import TrackRecordDatabase
@@ -40,7 +40,16 @@ def create_app(database_path: str | Path | None = None) -> Flask:
 
     @app.get("/")
     def dashboard():
+        react_index = Path(app.static_folder or "") / "react" / "index.html"
+        if react_index.exists():
+            return send_from_directory(react_index.parent, "index.html")
         return render_template("index.html")
+
+    @app.get("/assets/<path:filename>")
+    def dashboard_assets(filename: str):
+        return send_from_directory(
+            Path(app.static_folder or "") / "react" / "assets", filename
+        )
 
     @app.errorhandler(Exception)
     def handle_error(error: Exception):
