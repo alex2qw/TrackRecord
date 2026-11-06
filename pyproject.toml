@@ -29,3 +29,6 @@ select = ["E", "F", "I"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+trackrecord = ["templates/*.html", "static/*"]
