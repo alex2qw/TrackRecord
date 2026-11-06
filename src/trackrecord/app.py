@@ -119,6 +119,9 @@ def create_app(database_path: str | Path = "trackrecord.sqlite3") -> Flask:
             return result
         filters, events = result
         metrics = calculator.reliability(events)
+        rows = repository.list_events(filters)
+        dates = [row["scheduled_date"] for row in rows if row["scheduled_date"]]
+        latest_collection = repository.latest_collection_run()
         return {
             "filters": filters_to_dict(filters),
             "metrics": metrics_to_dict(metrics),
@@ -127,6 +130,13 @@ def create_app(database_path: str | Path = "trackrecord.sqlite3") -> Flask:
                 "sample_size": len(events),
                 "last_observed_at": max(
                     (event.observed_at for event in events), default=None
+                ),
+                "data_period": {
+                    "from": min(dates) if dates else None,
+                    "to": max(dates) if dates else None,
+                },
+                "latest_collection": (
+                    dict(latest_collection) if latest_collection else None
                 ),
             },
         }

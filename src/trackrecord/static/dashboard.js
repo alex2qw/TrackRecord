@@ -18,6 +18,11 @@ function formatMinutes(value) {
   return value == null ? "—" : `${Number(value).toFixed(1)} min`;
 }
 
+function formatPeriod(period) {
+  if (!period || !period.from || !period.to) return "—";
+  return period.from === period.to ? period.from : `${period.from} → ${period.to}`;
+}
+
 function drawBars(container, entries, valueKey = "value", formatter = formatPercent) {
   container.replaceChildren();
   if (!entries.length) {
@@ -95,7 +100,12 @@ async function loadDashboard() {
     document.querySelector("#coverage").textContent = formatPercent(metrics.coverage_percentage);
     document.querySelector("#coverage-note").textContent = `Coverage ${formatPercent(metrics.coverage_percentage)} · ${metrics.total_events} records`;
     document.querySelector("#data-source").textContent = reliability.metadata.data_source;
+    document.querySelector("#data-period").textContent = formatPeriod(reliability.metadata.data_period);
     document.querySelector("#last-observed").textContent = reliability.metadata.last_observed_at || "—";
+    const collection = reliability.metadata.latest_collection;
+    document.querySelector("#collection-status").textContent = collection
+      ? `${collection.status} · ${collection.records_saved} saved`
+      : "—";
     drawBars(document.querySelector("#delay-bars"), [
       { label: "On time", value: delays.bands.early_or_on_time / Math.max(1, delays.total_observed_events) * 100 },
       { label: "1–5 min", value: delays.bands["1_to_5_minutes"] / Math.max(1, delays.total_observed_events) * 100 },

@@ -36,6 +36,11 @@ def test_reliability_endpoint_returns_metrics_and_filters(tmp_path) -> None:
     assert body["filters"]["from_date"] == "2026-10-01"
     assert body["metrics"]["total_events"] == 1
     assert body["metrics"]["average_delay_minutes"] == 9.0
+    assert body["metadata"]["data_period"] == {
+        "from": "2026-10-12",
+        "to": "2026-10-12",
+    }
+    assert body["metadata"]["latest_collection"]["status"] == "succeeded"
 
 
 def test_api_lists_stations_and_routes(tmp_path) -> None:
