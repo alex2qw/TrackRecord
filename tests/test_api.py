@@ -84,3 +84,25 @@ def test_grouping_endpoints_return_json(tmp_path) -> None:
     assert weekday.status_code == 200
     assert "Monday" in weekday.get_json()["groups"]
     assert any(group["hour"] == 7 for group in hour.get_json()["groups"])
+
+
+def test_latest_collection_endpoint_reports_import(tmp_path) -> None:
+    client, _ = client_with_fixture(tmp_path)
+
+    response = client.get("/api/v1/collections/latest")
+
+    assert response.status_code == 200
+    collection = response.get_json()["collection"]
+    assert collection["source"] == "hsp_service_details"
+    assert collection["status"] == "succeeded"
+    assert collection["records_received"] == 24
+    assert collection["records_saved"] == 24
+
+
+def test_latest_collection_endpoint_is_empty_without_imports(tmp_path) -> None:
+    app = create_app(tmp_path / "empty.sqlite3")
+
+    response = app.test_client().get("/api/v1/collections/latest")
+
+    assert response.status_code == 200
+    assert response.get_json() == {"collection": None}

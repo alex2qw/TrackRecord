@@ -89,6 +89,7 @@ GET /api/v1/routes
 GET /api/v1/reliability
 GET /api/v1/delays
 GET /api/v1/cancellations
+GET /api/v1/collections/latest
 GET /api/v1/reliability/by-weekday
 GET /api/v1/reliability/by-hour
 ```

@@ -212,6 +212,11 @@ class TrainEventRepository:
             ).fetchall()
         )
 
+    def latest_collection_run(self) -> sqlite3.Row | None:
+        return self._connection.execute(
+            "SELECT * FROM collection_runs ORDER BY id DESC LIMIT 1"
+        ).fetchone()
+
     @staticmethod
     def _service_date(service_id: str) -> str | None:
         candidate = service_id[:8]

@@ -100,6 +100,11 @@ def create_app(database_path: str | Path = "trackrecord.sqlite3") -> Flask:
     def routes():
         return {"routes": [dict(row) for row in repository.list_routes()]}
 
+    @app.get("/api/v1/collections/latest")
+    def latest_collection():
+        run = repository.latest_collection_run()
+        return {"collection": dict(run) if run is not None else None}
+
     @app.get("/api/v1/reliability")
     def reliability():
         result = events_for_request()
