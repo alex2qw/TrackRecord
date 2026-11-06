@@ -55,11 +55,13 @@ function setSelectOptions(select, values, placeholder) {
 
 async function loadOptions() {
   const [stations, routes] = await Promise.all([
-    fetch("/api/v1/stations").then(response => response.json()),
-    fetch("/api/v1/routes").then(response => response.json()),
+    fetch("/api/v1/stations").then(readResponse),
+    fetch("/api/v1/routes").then(readResponse),
   ]);
-  setSelectOptions(document.querySelector("#station"), stations.stations.map(item => item.crs_code), "All stations");
-  setSelectOptions(document.querySelector("#operator"), [...new Set(routes.routes.map(item => item.operator))], "All operators");
+  const stationItems = Array.isArray(stations.stations) ? stations.stations : [];
+  const routeItems = Array.isArray(routes.routes) ? routes.routes : [];
+  setSelectOptions(document.querySelector("#station"), stationItems.map(item => item.crs_code), "All stations");
+  setSelectOptions(document.querySelector("#operator"), [...new Set(routeItems.map(item => item.operator).filter(Boolean))], "All operators");
 }
 
 async function loadDashboard() {
