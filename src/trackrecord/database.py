@@ -5,7 +5,6 @@ from __future__ import annotations
 import sqlite3
 from pathlib import Path
 
-
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS stations (
     crs_code TEXT PRIMARY KEY,
@@ -38,6 +37,7 @@ CREATE TABLE IF NOT EXISTS service_stops (
 CREATE TABLE IF NOT EXISTS collection_runs (
     id INTEGER PRIMARY KEY,
     source TEXT NOT NULL,
+    journey_leg TEXT,
     started_at TEXT NOT NULL,
     completed_at TEXT,
     records_received INTEGER NOT NULL DEFAULT 0,
@@ -63,11 +63,10 @@ class TrackRecordDatabase:
         self._add_column_if_missing("services", "origin_code", "TEXT")
         self._add_column_if_missing("services", "destination_code", "TEXT")
         self._add_column_if_missing("services", "journey_leg", "TEXT")
+        self._add_column_if_missing("collection_runs", "journey_leg", "TEXT")
         self._connection.commit()
 
-    def _add_column_if_missing(
-        self, table: str, column: str, column_type: str
-    ) -> None:
+    def _add_column_if_missing(self, table: str, column: str, column_type: str) -> None:
         columns = {
             row["name"]
             for row in self._connection.execute(f"PRAGMA table_info({table})")

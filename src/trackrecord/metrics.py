@@ -46,9 +46,7 @@ class MetricsCalculator:
             if event.delay_minutes is not None and not event.cancelled
         ]
         cancelled = [event for event in values if event.cancelled]
-        on_time = [
-            delay for delay in delays if delay <= self._on_time_threshold
-        ]
+        on_time = [delay for delay in delays if delay <= self._on_time_threshold]
         delayed_over_5 = [delay for delay in delays if delay > 5]
         delayed_over_15 = [delay for delay in delays if delay > 15]
         total = len(values)
@@ -60,9 +58,7 @@ class MetricsCalculator:
             on_time_events=len(on_time),
             delayed_over_5_events=len(delayed_over_5),
             delayed_over_15_events=len(delayed_over_15),
-            average_delay_minutes=(
-                sum(delays) / len(delays) if delays else None
-            ),
+            average_delay_minutes=(sum(delays) / len(delays) if delays else None),
             median_delay_minutes=median(delays) if delays else None,
             on_time_percentage=_percentage(len(on_time), len(delays)),
             cancellation_percentage=_percentage(len(cancelled), total),
@@ -92,10 +88,7 @@ class MetricsCalculator:
             hour = _scheduled_hour(event.scheduled_time)
             if hour is not None:
                 groups[hour].append(event)
-        return {
-            hour: self.reliability(groups[hour])
-            for hour in sorted(groups)
-        }
+        return {hour: self.reliability(groups[hour]) for hour in sorted(groups)}
 
     def group_by_date(
         self, events: Iterable[TrainEvent]

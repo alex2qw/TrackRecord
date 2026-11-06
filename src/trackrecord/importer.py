@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+import sqlite3
 from collections.abc import Mapping
 from datetime import datetime, timezone
 from typing import Any
-import sqlite3
 
 from .models import TrainEvent
 from .normalizer import NormalizationError, TrainEventNormalizer
@@ -37,7 +37,9 @@ class TrainEventImporter:
     ) -> int:
         """Persist a service-details payload and return inserted-record count."""
         timestamp = observed_at or datetime.now(timezone.utc).isoformat()
-        run_id = self._repository.start_collection(source, timestamp)
+        run_id = self._repository.start_collection(
+            source, timestamp, journey_leg=journey_leg
+        )
         try:
             events: list[TrainEvent] = self._normalizer.from_service_details(
                 payload, observed_at=timestamp

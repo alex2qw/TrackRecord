@@ -1,5 +1,6 @@
 import json
 import os
+
 import requests
 from dotenv import load_dotenv
 
@@ -13,10 +14,7 @@ if not username or not password or not metrics_url:
     print("Error: Missing environment variables in .env file.")
     exit(1)
 
-headers = {
-    "Content-Type": "application/json",
-    "User-Agent": "TrackRecordApp/1.0"
-}
+headers = {"Content-Type": "application/json", "User-Agent": "TrackRecordApp/1.0"}
 
 # Narrowed 2-day date window for a faster initial server response
 payload = {
@@ -26,7 +24,7 @@ payload = {
     "to_time": "0900",
     "from_date": "2026-10-12",
     "to_date": "2026-10-13",
-    "days": "WEEKDAY"
+    "days": "WEEKDAY",
 }
 
 print("Sending request to HSP API (timeout set to 30s)...")
@@ -37,7 +35,7 @@ try:
         auth=(username, password),
         headers=headers,
         json=payload,
-        timeout=30  # Increased timeout to allow backend aggregation
+        timeout=30,  # Increased timeout to allow backend aggregation
     )
 
     print(f"HTTP Status Code: {response.status_code}")

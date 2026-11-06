@@ -9,15 +9,11 @@ from trackrecord.repository import TrainEventRepository
 
 def client_with_fixture(tmp_path):
     database_path = tmp_path / "api.sqlite3"
-    payload = json.loads(
-        Path("fixtures/service_details_sample.json").read_text()
-    )
+    payload = json.loads(Path("fixtures/service_details_sample.json").read_text())
     with TrackRecordDatabase(database_path) as database:
         TrainEventImporter(
             TrainEventRepository(database.connection)
-        ).import_service_details(
-            payload, observed_at="2026-11-06T00:00:00+00:00"
-        )
+        ).import_service_details(payload, observed_at="2026-11-06T00:00:00+00:00")
     app = create_app(database_path)
     app.config.update(TESTING=True)
     return app.test_client(), app
@@ -60,13 +56,12 @@ def test_api_lists_stations_and_routes(tmp_path) -> None:
 
 def test_journey_leg_filters_are_explicit(tmp_path) -> None:
     database_path = tmp_path / "leg.sqlite3"
-    payload = json.loads(
-        Path("fixtures/service_details_sample.json").read_text()
-    )
+    payload = json.loads(Path("fixtures/service_details_sample.json").read_text())
     with TrackRecordDatabase(database_path) as database:
         repository = TrainEventRepository(database.connection)
         TrainEventImporter(repository).import_service_details(
-            payload, observed_at="2026-11-06T00:00:00+00:00",
+            payload,
+            observed_at="2026-11-06T00:00:00+00:00",
             journey_leg="HML-EUS",
         )
     client = create_app(database_path).test_client()
@@ -95,9 +90,7 @@ def test_delay_and_cancellation_endpoints_are_read_only(tmp_path) -> None:
     client, _ = client_with_fixture(tmp_path)
 
     delays = client.get("/api/v1/delays?event_type=arrival").get_json()
-    cancellations = client.get(
-        "/api/v1/cancellations?event_type=arrival"
-    ).get_json()
+    cancellations = client.get("/api/v1/cancellations?event_type=arrival").get_json()
 
     assert sum(delays["bands"].values()) == 12
     assert cancellations["cancelled_events"] == 0
@@ -136,6 +129,7 @@ def test_latest_collection_endpoint_reports_import(tmp_path) -> None:
     assert collection["status"] == "succeeded"
     assert collection["records_received"] == 24
     assert collection["records_saved"] == 24
+    assert collection["journey_leg"] is None
 
 
 def test_latest_collection_endpoint_is_empty_without_imports(tmp_path) -> None:
@@ -145,3 +139,38 @@ def test_latest_collection_endpoint_is_empty_without_imports(tmp_path) -> None:
 
     assert response.status_code == 200
     assert response.get_json() == {"collection": None}
+
+
+def test_data_quality_reports_filtered_counts(tmp_path) -> None:
+    client, _ = client_with_fixture(tmp_path)
+
+    response = client.get("/api/v1/data-quality")
+
+    assert response.status_code == 200
+    assert response.get_json()["quality"] == {
+        "events": 24,
+        "services": 1,
+        "missing_actual_times": 0,
+        "cancelled_events": 0,
+        "duplicate_events": 0,
+        "rejected_records": 0,
+    }
+
+
+def test_latest_collection_can_be_scoped_to_journey_leg(tmp_path) -> None:
+    database_path = tmp_path / "collections.sqlite3"
+    payload = json.loads(Path("fixtures/service_details_sample.json").read_text())
+    with TrackRecordDatabase(database_path) as database:
+        repository = TrainEventRepository(database.connection)
+        TrainEventImporter(repository).import_service_details(
+            payload, journey_leg="HML-EUS"
+        )
+        TrainEventImporter(repository).import_service_details(
+            payload, journey_leg="KGX-CBG"
+        )
+
+    client = create_app(database_path).test_client()
+    response = client.get("/api/v1/collections/latest?journey_leg=HML-EUS")
+
+    assert response.status_code == 200
+    assert response.get_json()["collection"]["journey_leg"] == "HML-EUS"

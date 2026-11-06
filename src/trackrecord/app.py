@@ -1,5 +1,6 @@
 """HTTP application entry point for TrackRecord."""
 
+import os
 from datetime import date
 from pathlib import Path
 
@@ -7,21 +8,30 @@ from flask import Flask, render_template, request
 from werkzeug.exceptions import HTTPException
 
 from .database import TrackRecordDatabase
-from .filters import EventFilters, VALID_WEEKDAYS
+from .filters import VALID_WEEKDAYS, EventFilters
 from .metrics import MetricsCalculator, delay_bands
 from .repository import TrainEventRepository
 from .serialization import filters_to_dict, metrics_to_dict, row_to_event
 
 
-def create_app(database_path: str | Path = "trackrecord.sqlite3") -> Flask:
+def create_app(database_path: str | Path | None = None) -> Flask:
     """Create the TrackRecord Flask application."""
     app = Flask(__name__)
+    database_path = database_path or os.environ.get(
+        "TRACKRECORD_DATABASE", "trackrecord.sqlite3"
+    )
     database = TrackRecordDatabase(database_path)
     repository = TrainEventRepository(database.connection)
     calculator = MetricsCalculator()
     allowed_query = {
-        "journey_leg", "station", "operator", "event_type", "from_date", "to_date",
-        "weekday", "hour",
+        "journey_leg",
+        "station",
+        "operator",
+        "event_type",
+        "from_date",
+        "to_date",
+        "weekday",
+        "hour",
     }
 
     @app.get("/health")
@@ -43,6 +53,7 @@ def create_app(database_path: str | Path = "trackrecord.sqlite3") -> Flask:
         unknown = set(request.args) - allowed_query
         if unknown:
             raise ValueError(f"Unknown query parameter: {sorted(unknown)[0]}")
+
         def optional_date(name: str) -> date | None:
             value = request.args.get(name)
             if value is None:
@@ -51,6 +62,7 @@ def create_app(database_path: str | Path = "trackrecord.sqlite3") -> Flask:
                 return date.fromisoformat(value)
             except ValueError as exc:
                 raise ValueError(f"{name} must use YYYY-MM-DD format") from exc
+
         from_date = optional_date("from_date")
         to_date = optional_date("to_date")
         if from_date and to_date and from_date > to_date:
@@ -109,8 +121,20 @@ def create_app(database_path: str | Path = "trackrecord.sqlite3") -> Flask:
 
     @app.get("/api/v1/collections/latest")
     def latest_collection():
-        run = repository.latest_collection_run()
+        journey_leg = request.args.get("journey_leg")
+        run = repository.latest_collection_run(journey_leg)
         return {"collection": dict(run) if run is not None else None}
+
+    @app.get("/api/v1/data-quality")
+    def data_quality():
+        result = events_for_request()
+        if isinstance(result[0], dict):
+            return result
+        filters, _ = result
+        return {
+            "filters": filters_to_dict(filters),
+            "quality": repository.data_quality(filters),
+        }
 
     @app.get("/api/v1/reliability")
     def reliability():
@@ -121,7 +145,7 @@ def create_app(database_path: str | Path = "trackrecord.sqlite3") -> Flask:
         metrics = calculator.reliability(events)
         rows = repository.list_events(filters)
         dates = [row["scheduled_date"] for row in rows if row["scheduled_date"]]
-        latest_collection = repository.latest_collection_run()
+        latest_collection = repository.latest_collection_run(filters.journey_leg)
         return {
             "filters": filters_to_dict(filters),
             "metrics": metrics_to_dict(metrics),

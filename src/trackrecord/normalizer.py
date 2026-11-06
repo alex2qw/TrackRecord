@@ -106,9 +106,12 @@ class TrainEventNormalizer:
         service_id = self._first_text(
             service or payload, ("rid", "RID", "service_id", "serviceId")
         )
-        operator = self._first_text(
-            service or payload, ("toc_code", "tocCode", "operator", "operatorCode")
-        ) or ""
+        operator = (
+            self._first_text(
+                service or payload, ("toc_code", "tocCode", "operator", "operatorCode")
+            )
+            or ""
+        )
         if not service_id:
             raise NormalizationError("serviceDetails payload has no service ID")
 
@@ -124,7 +127,8 @@ class TrainEventNormalizer:
                 location, ("cancelled", "canceled", "isCancelled")
             )
             cancel_reason = self._first_text(
-                location,                 ("cancel_reason", "cancelReason", "reason", "late_canc_reason")
+                location,
+                ("cancel_reason", "cancelReason", "reason", "late_canc_reason"),
             )
             # HSP uses late_canc_reason for both late-running and cancelled
             # services. A reason alone does not mean cancellation: this sample
@@ -181,9 +185,7 @@ class TrainEventNormalizer:
         return TrainEventNormalizer._required_text(mapping, key)
 
     @staticmethod
-    def _first_text(
-        mapping: Mapping[str, Any], keys: Sequence[str]
-    ) -> str | None:
+    def _first_text(mapping: Mapping[str, Any], keys: Sequence[str]) -> str | None:
         for key in keys:
             value = mapping.get(key)
             if value is not None and str(value).strip():

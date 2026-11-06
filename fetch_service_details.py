@@ -24,9 +24,7 @@ def main() -> None:
         if metrics_url:
             service_details_url = metrics_url.rsplit("/", 1)[0] + "/serviceDetails"
         else:
-            service_details_url = (
-                "https://hspfeeds.nationalrail.co.uk/serviceDetails"
-            )
+            service_details_url = "https://hspfeeds.nationalrail.co.uk/serviceDetails"
     client = HspClient(
         username,
         password,

@@ -79,11 +79,12 @@ async function loadDashboard() {
   errorBox.hidden = true;
   try {
     const query = queryString();
-    const [reliability, delays, byHour, byDate] = await Promise.all([
+    const [reliability, delays, byHour, byDate, quality] = await Promise.all([
       fetch(`/api/v1/reliability?${query}`).then(readResponse),
       fetch(`/api/v1/delays?${query}`).then(readResponse),
       fetch(`/api/v1/reliability/by-hour?${query}`).then(readResponse),
       fetch(`/api/v1/reliability/by-date?${query}`).then(readResponse),
+      fetch(`/api/v1/data-quality?${query}`).then(readResponse),
     ]);
     const metrics = reliability.metrics;
     if (!metrics.total_events) {
@@ -98,6 +99,8 @@ async function loadDashboard() {
     document.querySelector("#sample-size").textContent = metrics.total_events;
     document.querySelector("#observed-count").textContent = `${metrics.observed_events} with actual times`;
     document.querySelector("#coverage").textContent = formatPercent(metrics.coverage_percentage);
+    document.querySelector("#missing-actuals").textContent = quality.quality.missing_actual_times;
+    document.querySelector("#rejected-records").textContent = quality.quality.rejected_records;
     document.querySelector("#coverage-note").textContent = `Coverage ${formatPercent(metrics.coverage_percentage)} · ${metrics.total_events} records`;
     document.querySelector("#data-source").textContent = reliability.metadata.data_source;
     document.querySelector("#data-period").textContent = formatPeriod(reliability.metadata.data_period);

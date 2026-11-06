@@ -121,6 +121,7 @@ GET /api/v1/reliability
 GET /api/v1/delays
 GET /api/v1/cancellations
 GET /api/v1/collections/latest
+GET /api/v1/data-quality
 GET /api/v1/reliability/by-weekday
 GET /api/v1/reliability/by-hour
 ```
@@ -128,6 +129,40 @@ GET /api/v1/reliability/by-hour
 Metrics endpoints accept `station`, `operator`, `event_type`, `from_date`,
 `to_date`, `weekday`, and `hour` filters. Historical HSP metrics are kept
 separate from future live Darwin forecasts.
+
+The data-quality endpoint reports event and service counts, missing actual
+times, cancellations, duplicate groups, and rejected records. Collection
+history can be scoped with `?journey_leg=HML-EUS`.
+
+### CI and real-data verification
+
+CI runs the test suite plus Ruff formatting and lint checks. Locally:
+
+```bash
+pip install -e ".[dev]"
+pytest
+ruff format --check .
+ruff check .
+```
+
+After a bounded live collection, verify the leg and data quality:
+
+```bash
+curl "http://127.0.0.1:5000/api/v1/collections/latest?journey_leg=HML-EUS"
+curl "http://127.0.0.1:5000/api/v1/data-quality?journey_leg=HML-EUS"
+```
+
+### Local demo container
+
+The app can be run as a small container demo with a persistent SQLite volume:
+
+```bash
+docker compose up --build
+```
+
+Open `http://127.0.0.1:8000/`. The container starts with an empty database;
+collect or import data separately, then mount or copy the database into the
+volume. This demo does not include credentials or live collection jobs.
 
 ### Phase 6: dashboard
 

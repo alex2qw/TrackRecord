@@ -6,8 +6,8 @@ import sqlite3
 from collections.abc import Sequence
 from datetime import datetime, timezone
 
-from .models import TrainEvent
 from .filters import EventFilters
+from .models import TrainEvent
 
 
 class TrainEventRepository:
@@ -105,9 +105,7 @@ class TrainEventRepository:
             conditions.append("s.scheduled_date <= ?")
             parameters.append(filters.to_date.isoformat())
         if filters.weekday:
-            conditions.append(
-                "strftime('%w', s.scheduled_date) = ?"
-            )
+            conditions.append("strftime('%w', s.scheduled_date) = ?")
             parameters.append(str(_weekday_number(filters.weekday)))
         if filters.hour is not None:
             conditions.append("CAST(substr(ss.scheduled_time, 1, 2) AS INTEGER) = ?")
@@ -194,14 +192,19 @@ class TrainEventRepository:
                 (origin, destination, service_id),
             )
 
-    def start_collection(self, source: str, started_at: str | None = None) -> int:
+    def start_collection(
+        self,
+        source: str,
+        started_at: str | None = None,
+        journey_leg: str | None = None,
+    ) -> int:
         timestamp = started_at or datetime.now(timezone.utc).isoformat()
         cursor = self._connection.execute(
             """
-            INSERT INTO collection_runs (source, started_at, status)
-            VALUES (?, ?, 'running')
+            INSERT INTO collection_runs (source, journey_leg, started_at, status)
+            VALUES (?, ?, ?, 'running')
             """,
-            (source, timestamp),
+            (source, journey_leg, timestamp),
         )
         self._connection.commit()
         return int(cursor.lastrowid)
@@ -246,10 +249,47 @@ class TrainEventRepository:
             ).fetchall()
         )
 
-    def latest_collection_run(self) -> sqlite3.Row | None:
+    def latest_collection_run(
+        self, journey_leg: str | None = None
+    ) -> sqlite3.Row | None:
+        if journey_leg is None:
+            return self._connection.execute(
+                "SELECT * FROM collection_runs ORDER BY id DESC LIMIT 1"
+            ).fetchone()
         return self._connection.execute(
-            "SELECT * FROM collection_runs ORDER BY id DESC LIMIT 1"
+            """
+            SELECT * FROM collection_runs
+            WHERE journey_leg = ?
+            ORDER BY id DESC LIMIT 1
+            """,
+            (journey_leg,),
         ).fetchone()
+
+    def data_quality(self, filters: EventFilters | None = None) -> dict[str, int]:
+        """Return transparent quality counts for a filtered event set."""
+        filters = filters or EventFilters()
+        rows = self.list_events(filters)
+        service_ids = {row["service_id"] for row in rows}
+        duplicate_row = self._connection.execute(
+            """
+            SELECT COUNT(*) AS count
+            FROM (
+                SELECT service_id, station_code, event_type, scheduled_time
+                FROM service_stops
+                GROUP BY service_id, station_code, event_type, scheduled_time
+                HAVING COUNT(*) > 1
+            )
+            """
+        ).fetchone()
+        latest = self.latest_collection_run(filters.journey_leg)
+        return {
+            "events": len(rows),
+            "services": len(service_ids),
+            "missing_actual_times": sum(row["actual_time"] is None for row in rows),
+            "cancelled_events": sum(bool(row["cancelled"]) for row in rows),
+            "duplicate_events": int(duplicate_row["count"]) if duplicate_row else 0,
+            "rejected_records": int(latest["records_rejected"]) if latest else 0,
+        }
 
     @staticmethod
     def _service_date(service_id: str) -> str | None:
@@ -260,7 +300,12 @@ class TrainEventRepository:
 
 
 def _weekday_number(weekday: str) -> int:
-    return (
-        ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-        .index(weekday)
-    )
+    return [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+    ].index(weekday)

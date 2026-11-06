@@ -23,9 +23,7 @@ class FakeClient:
 
 def test_collector_fetches_bounded_unique_services(tmp_path) -> None:
     summary = json.loads(Path("fixtures/hsp_sample.json").read_text())
-    detail = json.loads(
-        Path("fixtures/service_details_sample.json").read_text()
-    )
+    detail = json.loads(Path("fixtures/service_details_sample.json").read_text())
     client = FakeClient(detail)
     with TrackRecordDatabase(tmp_path / "collector.sqlite3") as database:
         repository = TrainEventRepository(database.connection)

@@ -42,9 +42,7 @@ class HspCollector:
         if max_services < 1:
             raise ValueError("max_services must be positive")
         timestamp = observed_at or datetime.now(timezone.utc).isoformat()
-        summary_events = self._normalizer.from_summary(
-            summary, observed_at=timestamp
-        )
+        summary_events = self._normalizer.from_summary(summary, observed_at=timestamp)
         rids = list(dict.fromkeys(event.service_id for event in summary_events))
         selected = rids[:max_services]
         saved = 0

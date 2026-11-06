@@ -1,7 +1,7 @@
 """Explicit JSON serialization for API responses."""
 
-from .metrics import ReliabilityMetrics
 from .filters import EventFilters
+from .metrics import ReliabilityMetrics
 
 
 def metrics_to_dict(metrics: ReliabilityMetrics) -> dict[str, object]:

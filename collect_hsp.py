@@ -34,9 +34,7 @@ def main() -> None:
     password = os.environ.get("NRE_PASSWORD")
     metrics_url = os.environ.get("HSP_METRICS_URL")
     if not username or not password:
-        raise SystemExit(
-            "Collection requires NRE_USERNAME and NRE_PASSWORD"
-        )
+        raise SystemExit("Collection requires NRE_USERNAME and NRE_PASSWORD")
 
     with TrackRecordDatabase(args.database) as database:
         repository = TrainEventRepository(database.connection)
@@ -49,9 +47,7 @@ def main() -> None:
             service_details_url=service_details_url,
         )
         if args.summary_fixture:
-            summary = json.loads(
-                args.summary_fixture.read_text(encoding="utf-8")
-            )
+            summary = json.loads(args.summary_fixture.read_text(encoding="utf-8"))
         else:
             if not metrics_url or not args.from_date or not args.to_date:
                 raise SystemExit(

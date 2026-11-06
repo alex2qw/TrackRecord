@@ -47,9 +47,7 @@ def test_service_details_uses_departure_when_arrival_is_missing() -> None:
         }
     }
 
-    event = TrainEventNormalizer().from_service_details(
-        payload, observed_at="now"
-    )[0]
+    event = TrainEventNormalizer().from_service_details(payload, observed_at="now")[0]
 
     assert event.scheduled_time == "0703"
     assert event.actual_time == "0707"
