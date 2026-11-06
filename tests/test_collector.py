@@ -30,7 +30,7 @@ def test_collector_fetches_bounded_unique_services(tmp_path) -> None:
     with TrackRecordDatabase(tmp_path / "collector.sqlite3") as database:
         repository = TrainEventRepository(database.connection)
         result = HspCollector(
-            client, TrainEventImporter(repository)
+            client, TrainEventImporter(repository), journey_leg="HML-EUS"
         ).collect_summary(summary, max_services=2, observed_at="now")
 
         assert result == {
@@ -41,3 +41,4 @@ def test_collector_fetches_bounded_unique_services(tmp_path) -> None:
         }
         assert len(client.requested) == 2
         assert repository.count_events() == 48
+        assert repository.list_journey_legs() == ["HML-EUS"]

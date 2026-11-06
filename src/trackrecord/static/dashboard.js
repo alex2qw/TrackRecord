@@ -54,13 +54,16 @@ function setSelectOptions(select, values, placeholder) {
 }
 
 async function loadOptions() {
-  const [stations, routes] = await Promise.all([
+  const [stations, routes, journeyLegs] = await Promise.all([
     fetch("/api/v1/stations").then(readResponse),
     fetch("/api/v1/routes").then(readResponse),
+    fetch("/api/v1/journey-legs").then(readResponse),
   ]);
   const stationItems = Array.isArray(stations.stations) ? stations.stations : [];
   const routeItems = Array.isArray(routes.routes) ? routes.routes : [];
+  const legs = Array.isArray(journeyLegs.journey_legs) ? journeyLegs.journey_legs : [];
   setSelectOptions(document.querySelector("#station"), stationItems.map(item => item.crs_code), "All stations");
+  setSelectOptions(document.querySelector("#journey_leg"), legs, "All journey legs");
   setSelectOptions(document.querySelector("#operator"), [...new Set(routeItems.map(item => item.operator).filter(Boolean))], "All operators");
 }
 

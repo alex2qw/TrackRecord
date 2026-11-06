@@ -24,6 +24,9 @@ def main() -> None:
     parser.add_argument("--pause-seconds", type=float, default=0.25)
     parser.add_argument("--from-date")
     parser.add_argument("--to-date")
+    parser.add_argument("--from-loc", default="HML")
+    parser.add_argument("--to-loc", default="EUS")
+    parser.add_argument("--journey-leg", default="HML-EUS")
     args = parser.parse_args()
     load_dotenv()
 
@@ -57,8 +60,8 @@ def main() -> None:
                 )
             summary = client.get_service_metrics(
                 {
-                    "from_loc": "HML",
-                    "to_loc": "EUS",
+                    "from_loc": args.from_loc,
+                    "to_loc": args.to_loc,
                     "from_time": "0700",
                     "to_time": "0900",
                     "from_date": args.from_date,
@@ -68,7 +71,10 @@ def main() -> None:
             )
 
         result = HspCollector(
-            client, importer, pause_seconds=args.pause_seconds
+            client,
+            importer,
+            pause_seconds=args.pause_seconds,
+            journey_leg=args.journey_leg,
         ).collect_summary(summary, max_services=args.max_services)
         print(json.dumps(result, indent=2))
 

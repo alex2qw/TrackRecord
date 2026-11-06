@@ -17,7 +17,8 @@ CREATE TABLE IF NOT EXISTS services (
     operator TEXT NOT NULL,
     scheduled_date TEXT,
     origin_code TEXT,
-    destination_code TEXT
+    destination_code TEXT,
+    journey_leg TEXT
 );
 
 CREATE TABLE IF NOT EXISTS service_stops (
@@ -61,6 +62,7 @@ class TrackRecordDatabase:
         self._connection.executescript(SCHEMA)
         self._add_column_if_missing("services", "origin_code", "TEXT")
         self._add_column_if_missing("services", "destination_code", "TEXT")
+        self._add_column_if_missing("services", "journey_leg", "TEXT")
         self._connection.commit()
 
     def _add_column_if_missing(

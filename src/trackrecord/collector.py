@@ -21,6 +21,7 @@ class HspCollector:
         importer: TrainEventImporter,
         *,
         pause_seconds: float = 0.0,
+        journey_leg: str | None = None,
     ) -> None:
         if pause_seconds < 0:
             raise ValueError("pause_seconds must not be negative")
@@ -28,6 +29,7 @@ class HspCollector:
         self._importer = importer
         self._normalizer = TrainEventNormalizer()
         self._pause_seconds = pause_seconds
+        self._journey_leg = journey_leg
 
     def collect_summary(
         self,
@@ -51,7 +53,7 @@ class HspCollector:
             try:
                 details = self._client.get_service_details(rid)
                 saved += self._importer.import_service_details(
-                    details, observed_at=timestamp
+                    details, observed_at=timestamp, journey_leg=self._journey_leg
                 )
             except (HspClientError, ImportError):
                 failed += 1

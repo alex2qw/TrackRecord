@@ -49,7 +49,30 @@ def test_api_lists_stations_and_routes(tmp_path) -> None:
         "origin_code": "MKC",
         "destination_code": "EUS",
         "operator": "LM",
+        "journey_leg": None,
     } in routes
+
+
+def test_journey_leg_filters_are_explicit(tmp_path) -> None:
+    database_path = tmp_path / "leg.sqlite3"
+    payload = json.loads(
+        Path("fixtures/service_details_sample.json").read_text()
+    )
+    with TrackRecordDatabase(database_path) as database:
+        repository = TrainEventRepository(database.connection)
+        TrainEventImporter(repository).import_service_details(
+            payload, observed_at="2026-11-06T00:00:00+00:00",
+            journey_leg="HML-EUS",
+        )
+    client = create_app(database_path).test_client()
+
+    legs = client.get("/api/v1/journey-legs").get_json()
+    filtered = client.get("/api/v1/reliability?journey_leg=HML-EUS")
+    unknown = client.get("/api/v1/reliability?journey_leg=KGX-CBG")
+
+    assert legs == {"journey_legs": ["HML-EUS"]}
+    assert filtered.get_json()["metrics"]["total_events"] == 24
+    assert unknown.status_code == 400
 
 
 def test_invalid_filters_return_bad_request(tmp_path) -> None:

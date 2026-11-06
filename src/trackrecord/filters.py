@@ -19,6 +19,7 @@ VALID_WEEKDAYS = {
 
 @dataclass(frozen=True, slots=True)
 class EventFilters:
+    journey_leg: str | None = None
     station_code: str | None = None
     operator: str | None = None
     event_type: str | None = None

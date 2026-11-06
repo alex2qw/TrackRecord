@@ -22,6 +22,7 @@ def metrics_to_dict(metrics: ReliabilityMetrics) -> dict[str, object]:
 
 def filters_to_dict(filters: EventFilters) -> dict[str, object]:
     result = {
+        "journey_leg": filters.journey_leg,
         "station": filters.station_code,
         "operator": filters.operator,
         "event_type": filters.event_type,

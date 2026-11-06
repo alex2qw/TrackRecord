@@ -23,12 +23,15 @@ def main() -> None:
         type=Path,
         default=Path("trackrecord.sqlite3"),
     )
+    parser.add_argument("--journey-leg")
     args = parser.parse_args()
 
     payload = json.loads(args.fixture.read_text(encoding="utf-8"))
     with TrackRecordDatabase(args.database) as database:
         repository = TrainEventRepository(database.connection)
-        saved = TrainEventImporter(repository).import_service_details(payload)
+        saved = TrainEventImporter(repository).import_service_details(
+            payload, journey_leg=args.journey_leg
+        )
         print(f"Saved {saved} new events to {args.database}")
 
 

@@ -84,6 +84,9 @@ python collect_hsp.py \
   --max-services 10
 ```
 
+Use `--from-loc`, `--to-loc`, and `--journey-leg` to collect another leg,
+for example `--from-loc KGX --to-loc CBG --journey-leg KGX-CBG`.
+
 To develop without requesting a new summary, reuse the saved summary fixture:
 
 ```bash
@@ -113,6 +116,7 @@ The historical API reads from SQLite and exposes:
 GET /health
 GET /api/v1/stations
 GET /api/v1/routes
+GET /api/v1/journey-legs
 GET /api/v1/reliability
 GET /api/v1/delays
 GET /api/v1/cancellations

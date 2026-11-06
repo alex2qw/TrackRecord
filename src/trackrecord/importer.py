@@ -33,6 +33,7 @@ class TrainEventImporter:
         *,
         observed_at: str | None = None,
         source: str = "hsp_service_details",
+        journey_leg: str | None = None,
     ) -> int:
         """Persist a service-details payload and return inserted-record count."""
         timestamp = observed_at or datetime.now(timezone.utc).isoformat()
@@ -41,7 +42,7 @@ class TrainEventImporter:
             events: list[TrainEvent] = self._normalizer.from_service_details(
                 payload, observed_at=timestamp
             )
-            saved = self._repository.save_events(events)
+            saved = self._repository.save_events(events, journey_leg=journey_leg)
             self._repository.finish_collection(
                 run_id,
                 status="succeeded",

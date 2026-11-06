@@ -20,7 +20,7 @@ def create_app(database_path: str | Path = "trackrecord.sqlite3") -> Flask:
     repository = TrainEventRepository(database.connection)
     calculator = MetricsCalculator()
     allowed_query = {
-        "station", "operator", "event_type", "from_date", "to_date",
+        "journey_leg", "station", "operator", "event_type", "from_date", "to_date",
         "weekday", "hour",
     }
 
@@ -71,6 +71,7 @@ def create_app(database_path: str | Path = "trackrecord.sqlite3") -> Flask:
             if not 0 <= hour <= 23:
                 raise ValueError("hour must be an integer from 0 to 23")
         return EventFilters(
+            journey_leg=request.args.get("journey_leg"),
             station_code=request.args.get("station"),
             operator=request.args.get("operator"),
             event_type=event_type,
@@ -87,6 +88,8 @@ def create_app(database_path: str | Path = "trackrecord.sqlite3") -> Flask:
             return {"error": str(exc)}, 400
         if filters.station_code and not repository.has_station(filters.station_code):
             return {"error": f"Unknown station code: {filters.station_code}"}, 400
+        if filters.journey_leg and not repository.has_journey_leg(filters.journey_leg):
+            return {"error": f"Unknown journey leg: {filters.journey_leg}"}, 400
         if filters.operator and not repository.has_operator(filters.operator):
             return {"error": f"Unknown operator: {filters.operator}"}, 400
         rows = repository.list_events(filters)
@@ -99,6 +102,10 @@ def create_app(database_path: str | Path = "trackrecord.sqlite3") -> Flask:
     @app.get("/api/v1/routes")
     def routes():
         return {"routes": [dict(row) for row in repository.list_routes()]}
+
+    @app.get("/api/v1/journey-legs")
+    def journey_legs():
+        return {"journey_legs": repository.list_journey_legs()}
 
     @app.get("/api/v1/collections/latest")
     def latest_collection():

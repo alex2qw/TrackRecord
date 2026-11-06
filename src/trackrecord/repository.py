@@ -16,15 +16,18 @@ class TrainEventRepository:
     def __init__(self, connection: sqlite3.Connection) -> None:
         self._connection = connection
 
-    def save_events(self, events: Sequence[TrainEvent]) -> int:
+    def save_events(
+        self, events: Sequence[TrainEvent], *, journey_leg: str | None = None
+    ) -> int:
         """Insert services, stations, and stops idempotently."""
         inserted_stops = 0
         for event in events:
             self._connection.execute(
                 """
                 INSERT OR IGNORE INTO services
-                    (provider_service_id, operator, scheduled_date, origin_code, destination_code)
-                VALUES (?, ?, ?, ?, ?)
+                    (provider_service_id, operator, scheduled_date, origin_code,
+                     destination_code, journey_leg)
+                VALUES (?, ?, ?, ?, ?, ?)
                 """,
                 (
                     event.service_id,
@@ -32,12 +35,22 @@ class TrainEventRepository:
                     self._service_date(event.service_id),
                     None,
                     None,
+                    journey_leg,
                 ),
             )
             self._connection.execute(
                 "INSERT OR IGNORE INTO stations (crs_code) VALUES (?)",
                 (event.station_code,),
             )
+            if journey_leg is not None:
+                self._connection.execute(
+                    """
+                    UPDATE services
+                    SET journey_leg = ?
+                    WHERE provider_service_id = ?
+                    """,
+                    (journey_leg, event.service_id),
+                )
             cursor = self._connection.execute(
                 """
                 INSERT OR IGNORE INTO service_stops (
@@ -76,6 +89,9 @@ class TrainEventRepository:
         if filters.station_code:
             conditions.append("ss.station_code = ?")
             parameters.append(filters.station_code)
+        if filters.journey_leg:
+            conditions.append("s.journey_leg = ?")
+            parameters.append(filters.journey_leg)
         if filters.operator:
             conditions.append("s.operator = ?")
             parameters.append(filters.operator)
@@ -129,14 +145,32 @@ class TrainEventRepository:
         ).fetchone()
         return row is not None
 
+    def has_journey_leg(self, journey_leg: str) -> bool:
+        row = self._connection.execute(
+            "SELECT 1 FROM services WHERE journey_leg = ?", (journey_leg,)
+        ).fetchone()
+        return row is not None
+
+    def list_journey_legs(self) -> list[str]:
+        rows = self._connection.execute(
+            """
+            SELECT DISTINCT journey_leg
+            FROM services
+            WHERE journey_leg IS NOT NULL
+            ORDER BY journey_leg
+            """
+        ).fetchall()
+        return [str(row["journey_leg"]) for row in rows]
+
     def list_routes(self) -> list[sqlite3.Row]:
         return list(
             self._connection.execute(
                 """
                 SELECT DISTINCT origin_code, destination_code, operator
+                    , journey_leg
                 FROM services
                 WHERE origin_code IS NOT NULL AND destination_code IS NOT NULL
-                ORDER BY origin_code, destination_code, operator
+                ORDER BY journey_leg, origin_code, destination_code, operator
                 """
             ).fetchall()
         )
