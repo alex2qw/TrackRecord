@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TrackRecord | Train reliability</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+  </head>
+  <body>
+    <main class="shell">
+      <header class="masthead">
+        <div>
+          <p class="eyebrow">TRACKRECORD · HISTORICAL VIEW</p>
+          <h1>Know the journey<br><em>before you take it.</em></h1>
+          <p class="lede">Evidence-based reliability for the routes you use to get to university.</p>
+        </div>
+        <div class="source-badge">
+          <span class="status-dot"></span>
+          <span>National Rail HSP</span>
+        </div>
+      </header>
+
+      <section class="filters panel" aria-labelledby="filters-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">01 · FILTERS</p>
+            <h2 id="filters-heading">Choose a journey view</h2>
+          </div>
+          <button id="reset-filters" class="button secondary" type="button">Reset</button>
+        </div>
+        <form id="filter-form">
+          <label>Station
+            <select id="station" name="station"><option value="">All stations</option></select>
+          </label>
+          <label>Operator
+            <select id="operator" name="operator"><option value="">All operators</option></select>
+          </label>
+          <label>Event
+            <select id="event_type" name="event_type">
+              <option value="">Arrivals & departures</option>
+              <option value="departure">Departures</option>
+              <option value="arrival">Arrivals</option>
+            </select>
+          </label>
+          <label>From
+            <input id="from_date" name="from_date" type="date">
+          </label>
+          <label>To
+            <input id="to_date" name="to_date" type="date">
+          </label>
+          <button class="button primary" type="submit">Update view</button>
+        </form>
+        <p id="filter-error" class="message error" role="alert" hidden></p>
+      </section>
+
+      <section id="dashboard" aria-live="polite">
+        <div id="loading" class="panel message">Loading reliability data…</div>
+        <div id="empty" class="panel message" hidden>No records match these filters.</div>
+        <div id="content" hidden>
+          <div class="section-heading intro-heading">
+            <div>
+              <p class="eyebrow">02 · OVERVIEW</p>
+              <h2>Your reliability snapshot</h2>
+            </div>
+            <p id="coverage-note" class="coverage-note"></p>
+          </div>
+          <div class="cards">
+            <article class="card"><span>On-time services</span><strong id="on-time">—</strong><small id="on-time-count"></small></article>
+            <article class="card"><span>Average delay</span><strong id="average-delay">—</strong><small>observed, non-cancelled</small></article>
+            <article class="card"><span>Cancellation rate</span><strong id="cancellation-rate">—</strong><small id="cancelled-count"></small></article>
+            <article class="card"><span>Records analysed</span><strong id="sample-size">—</strong><small id="observed-count"></small></article>
+          </div>
+
+          <div class="grid">
+            <section class="panel chart-panel">
+              <div class="section-heading compact"><div><p class="eyebrow">03 · DELAYS</p><h2>Delay distribution</h2></div></div>
+              <div id="delay-bars" class="bars"></div>
+              <p class="caption">Cancelled services are excluded from delay bands. “On time” includes early services.</p>
+            </section>
+            <section class="panel chart-panel">
+              <div class="section-heading compact"><div><p class="eyebrow">04 · BY HOUR</p><h2>Scheduled departure pattern</h2></div></div>
+              <div id="hour-groups" class="bars"></div>
+              <p class="caption">Bars show on-time percentage for each scheduled local hour.</p>
+            </section>
+          </div>
+
+          <section class="panel table-panel">
+            <div class="section-heading compact"><div><p class="eyebrow">05 · CONTEXT</p><h2>Data context</h2></div></div>
+            <dl class="context-grid">
+              <div><dt>Source</dt><dd id="data-source">—</dd></div>
+              <div><dt>Last observed</dt><dd id="last-observed">—</dd></div>
+              <div><dt>Coverage</dt><dd id="coverage">—</dd></div>
+              <div><dt>Metric rule</dt><dd>On time ≤ 1 minute late</dd></div>
+            </dl>
+          </section>
+        </div>
+      </section>
+
+      <footer>TrackRecord · Historical metrics, not live forecasts · Data coverage matters.</footer>
+    </main>
+    <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+  </body>
+</html>

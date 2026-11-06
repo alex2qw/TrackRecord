@@ -15,7 +15,9 @@ CREATE TABLE IF NOT EXISTS stations (
 CREATE TABLE IF NOT EXISTS services (
     provider_service_id TEXT PRIMARY KEY,
     operator TEXT NOT NULL,
-    scheduled_date TEXT
+    scheduled_date TEXT,
+    origin_code TEXT,
+    destination_code TEXT
 );
 
 CREATE TABLE IF NOT EXISTS service_stops (
@@ -55,7 +57,21 @@ class TrackRecordDatabase:
         self._connection.row_factory = sqlite3.Row
         self._connection.execute("PRAGMA foreign_keys = ON")
         self._connection.executescript(SCHEMA)
+        self._add_column_if_missing("services", "origin_code", "TEXT")
+        self._add_column_if_missing("services", "destination_code", "TEXT")
         self._connection.commit()
+
+    def _add_column_if_missing(
+        self, table: str, column: str, column_type: str
+    ) -> None:
+        columns = {
+            row["name"]
+            for row in self._connection.execute(f"PRAGMA table_info({table})")
+        }
+        if column not in columns:
+            self._connection.execute(
+                f"ALTER TABLE {table} ADD COLUMN {column} {column_type}"
+            )
 
     @property
     def connection(self) -> sqlite3.Connection:

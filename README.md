@@ -69,6 +69,42 @@ The persistence model keeps `services`, `stations`, `service_stops`, and
 different stop events so reliability metrics can distinguish an on-time
 departure from an on-time arrival.
 
+### Phase 4: historical metrics
+
+Metric definitions and the pure metrics engine are documented in
+`docs/metrics.md`. Run the test suite with:
+
+```bash
+pytest
+```
+
+### Phase 5: read-only API
+
+The historical API reads from SQLite and exposes:
+
+```text
+GET /health
+GET /api/v1/stations
+GET /api/v1/routes
+GET /api/v1/reliability
+GET /api/v1/delays
+GET /api/v1/cancellations
+GET /api/v1/reliability/by-weekday
+GET /api/v1/reliability/by-hour
+```
+
+Metrics endpoints accept `station`, `operator`, `event_type`, `from_date`,
+`to_date`, `weekday`, and `hour` filters. Historical HSP metrics are kept
+separate from future live Darwin forecasts.
+
+### Phase 6: dashboard
+
+Open `http://127.0.0.1:5000/` after starting Flask to view the dashboard.
+It provides overview cards, delay distribution, hourly comparisons, filters,
+sample-size information, and data-coverage context. This phase uses only the
+historical API; live Darwin forecasts and TfL transfer calculations are not
+included.
+
 ## Roadmap
 
 1. Select and document a permitted data source.
